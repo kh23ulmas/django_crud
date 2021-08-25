@@ -5,7 +5,7 @@ import uuid
 # Create your models here.
 class Genre(models.Model):
     """Model representing a book genre"""
-    name = models.CharField( help_text='Enter a book genre (e.g. Science Fiction', max_length=200)
+    name = models.CharField( help_text='Enter a book genre (e.g. Science Fiction)', max_length=200)
 
     def __str__(self):
         return self.name
@@ -24,13 +24,20 @@ class Book(models.Model):
     # Genre class has already been defined so we can specify the object above.
     genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
 
-    language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
+    language = models.ForeignKey("Language", on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.name
+        return self.title
     
     def get_absolute_url(self):
-        return reverse("book_detail", args=[str(self.id)])
+        return reverse('book-detail', args=[str(self.id)])
+
+    def display_genre(self):
+        """
+        Creates a string for the Genre. This is required to display genre in Admin.
+        """
+        return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+    display_genre.short_description = 'Genre'
 
 class BookInstance(models.Model):
     """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
